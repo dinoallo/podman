@@ -1923,6 +1923,16 @@ func (d *Driver) get(id string, disableShifting bool, options graphdriver.MountO
 		return "", fmt.Errorf("creating overlay mount to %s, mount_data=%q: %w", mountTarget, mountData, err)
 	}
 
+	// Print the contents of the mountTarget directory with depth = 1
+	if entries, err := os.ReadDir(mountTarget); err == nil {
+		names := make([]string, 0, len(entries))
+		for _, entry := range entries {
+			names = append(names, entry.Name())
+		}
+		logrus.Debugf("Contents of %s: %v", mountTarget, names)
+	} else {
+		logrus.Debugf("Failed to list contents of %s: %v", mountTarget, err)
+	}
 	return mergedDir, nil
 }
 

@@ -1880,6 +1880,7 @@ func (d *Driver) get(id string, disableShifting bool, options graphdriver.MountO
 			}
 			return nil
 		}
+		logrus.Debugf("using mount program %s for overlayfs mount, mount_data=%s", d.options.mountProgram, mountData)
 	} else if len(mountData) >= pageSize {
 		// Use mountFrom when the mount data has exceeded the page size. The mount syscall fails if
 		// the mount data cannot fit within a page and relative links make the mount data much
@@ -1901,6 +1902,9 @@ func (d *Driver) get(id string, disableShifting bool, options graphdriver.MountO
 		if !inAdditionalStore {
 			mountTarget = path.Join(id, "merged")
 		}
+		logrus.Debugf("use mountFrom for overlayfs mount, mount_data=%s", mountData)
+	} else {
+		logrus.Debugf("use unix.Mount for overlayfs mount, mount_data=%s", mountData)
 	}
 
 	// overlay has a check in place to prevent mounting the same file system twice
@@ -1912,6 +1916,9 @@ func (d *Driver) get(id string, disableShifting bool, options graphdriver.MountO
 
 	flags, data := mount.ParseOptions(mountData)
 	logrus.Debugf("overlay: mount_data=%s", mountData)
+	logrus.Debugf("overlay: mount_target=%s", mountTarget)
+	logrus.Debugf("overlay: mount_flags=%d", flags)
+	logrus.Debugf("overlay: data=%s", data)
 	if err := mountFunc("overlay", mountTarget, "overlay", uintptr(flags), data); err != nil {
 		return "", fmt.Errorf("creating overlay mount to %s, mount_data=%q: %w", mountTarget, mountData, err)
 	}

@@ -1660,9 +1660,11 @@ func (d *Driver) get(id string, disableShifting bool, options graphdriver.MountO
 	} else if dest != "" {
 		diffDir = dest
 	}
+	logrus.Debugf("build diffDir for %q: %q", id, diffDir)
 
 	// For each lower, resolve its path, and append it and any additional diffN
 	// directories to the lowers list.
+	logrus.Debugf("The splitLowers for %q are: %v", id, splitLowers)
 	for i, l := range splitLowers {
 		if l == "" {
 			continue
@@ -1785,6 +1787,7 @@ func (d *Driver) get(id string, disableShifting bool, options graphdriver.MountO
 
 		// rewrite the lower dirs to their idmapped mount.
 		c := 0
+		logrus.Debugf("The absLowers for %q are: %v", id, absLowers)
 		for _, absLower := range absLowers {
 			mappedMountSrc := getMappedMountRoot(absLower)
 
